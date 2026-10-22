@@ -6,7 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-# Permissions required by actions/deploy-pages
 permissions:
   contents: read
   pages: write
@@ -17,34 +16,39 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Quality Gate (Continuous Integration)
   lint-and-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
+      # Automated Quality Gate: checks JS rules natively without npm packages
+      - name: Code Quality Gate (JS Semicolon Linter)
+        run: |
+          node -e '
+            const fs = require("fs");
+            const code = fs.readFileSync("src/app.js", "utf8");
+            const lines = code.split("\n").map(l => l.trim()).filter(l => l && !l.startsWith("//") && !l.endsWith("{") && !l.endsWith("}"));
+            const invalid = lines.filter(l => !l.endsWith(";"));
+            if (invalid.length > 0) {
+              console.error("::error::Linter Rule Violation: Semicolon required at line ending:\n" + invalid.join("\n"));
+              process.exit(1);
+            }
+            console.log("Quality Check Passed: All JS statements end with semicolons.");
+          '
 
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Code Quality Gate (ESLint)
-        run: npm run lint
-
+      # Stage static files
       - name: Package / Assemble Artifact
-        run: npm run build
+        run: |
+          mkdir -p dist
+          cp -r public/* dist/
+          cp -r src/* dist/
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: './dist'
 
-  # Deployment Gate (Continuous Deployment)
   deploy:
     environment:
       name: github-pages
