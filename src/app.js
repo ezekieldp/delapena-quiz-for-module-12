@@ -1,4 +1,4 @@
-const statusMessage = document.getElementById('status-msg');
+const statusMessage = document.getElementById('status-msg')
 const actionButton = document.getElementById('action-btn');
 
 function updateStatus() {
