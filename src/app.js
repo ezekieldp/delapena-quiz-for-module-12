@@ -1,8 +1,17 @@
-const statusMessage = document.getElementById('status-msg')
-const actionButton = document.getElementById('action-btn');
+function initializePipelineDemo() {
+  const statusMessage = document.getElementById('status-msg');
+  const actionButton = document.getElementById('action-btn');
 
-function updateStatus() {
-  statusMessage.textContent = 'System is operating nominally. SCM pipeline passed!';
+  statusMessage.textContent = 'Application loaded successfully. Ready to run task.';
+  actionButton.addEventListener('click', () => {
+    statusMessage.textContent = 'System is operating nominally. SCM pipeline passed!';
+  });
 }
 
-actionButton.addEventListener('click', updateStatus);
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', initializePipelineDemo);
+}
+
+if (typeof module !== 'undefined') {
+  module.exports = { initializePipelineDemo };
+}
