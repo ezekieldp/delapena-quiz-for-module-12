@@ -4,7 +4,7 @@ function initializePipelineDemo() {
 
   statusMessage.textContent = 'Application loaded successfully. Ready to run task.';
   actionButton.addEventListener('click', () => {
-    statusMessage.textContent = 'System is operating nominally. SCM pipeline passed!';
+    statusMessage.textContent = 'Application started.';
   });
 }
 
